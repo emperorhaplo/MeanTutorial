@@ -3,10 +3,24 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var mongoose = require('mongoose');
+var Promise = require('bluebird');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var serviceRouter = require('./routes/router');
 
+// database setup
+mongoose.Promise = Promise;
+mongoose.connect('mongodb://localhost:27017/MeanTutorial', { useNewUrlParser: true })
+.then(() => {
+  console.log('Connected to database.')
+})
+.catch((error) => {
+  console.log('Error connecting to database: ' + error)
+})
+
+// express app setup
 var app = express();
 
 // view engine setup
@@ -21,6 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/api', serviceRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
