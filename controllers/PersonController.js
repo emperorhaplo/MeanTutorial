@@ -12,6 +12,6 @@ exports.deletePerson = async function(req, res, next) {
     return res.sendStatus(200)
 }
 
-exports.updatePerson = async function(req, res, next, query) {
+exports.updatePerson = async function(req, res, next) {
     return res.sendStatus(200)
 }
