@@ -12,10 +12,10 @@ exports.addPerson = async function(req, res, next) {
     try {
         var persons = await Person.paginate({ name: req.query.name }, {})
         if (persons.total > 0) {
-            return res.status(400).json({ message: "Person with same name already exists." })
+            throw Error("Person with same name already exists.")
         }
         var createPerson = await newPerson.save()
-        return res.status(200).json({ message: "Person created successfully."})
+        return res.status(201).json({ message: "Person created successfully.", data: createPerson})
         
     } catch(error) {
         return res.status(400).json({ message: error.messsage });
@@ -36,16 +36,43 @@ exports.getPerson = async function(req, res, next) {
 }
 
 exports.deletePerson = async function(req, res, next) {
-    // digest the request
-    // turn it into a query
-    // make sure the query corresponds to one result
-    // return the result
+    var id = req.query.id ? req.query.id : false
+
+    try {
+        if(!id) {
+            throw Error('ID is not present on the request.')
+        }
+        var result = await Person.deleteOne({ _id: id })
+        if (result.deletedCount === 1) {
+            return res.status(200).json({ message: 'Person deleted successfully.' })
+        }
+        throw Error('deleted count is ' + result.deletedCount)
+    } catch (error) {
+        return res.status(400).json({ message: 'Delete person failed with error: ' + error.message })
+    }
 }
 
 exports.updatePerson = async function(req, res, next) {
-    // digest the request
-    // turn it into a query
-    // make sure the query corresponds to one result
-    // update that result with contents of the query
-    // return the result
+    var id = req.query.id ? req.query.id : false
+    var name = req.query.name ? req.query.name.toLowerCase() : null
+    var age = req.query.age ? req.query.age : null
+    try {
+        if (!id) {
+            throw Error('ID is not present on the request.')
+        }
+        var person = await Person.findById(id)
+        if (!person) {
+            throw Error('Could not find person with ID ' + id)
+        }
+        if(name) {
+            person.name = name
+        }
+        if(age) {
+            person.age = age
+        }
+        var result = await person.save()
+        return res.status(200).json({ message: 'Person updated successfully with result.', data: result })
+    } catch (error) {
+        return res.status(400).json({ message: 'Update person failed with error: ' + error.message })
+    }
 }
