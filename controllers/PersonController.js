@@ -24,7 +24,7 @@ exports.addPerson = async function(req, res, next) {
 
 exports.getPerson = async function(req, res, next) {
     var page = req.query.page ? parseInt(req.query.page) : 1;
-    var limit = req.query.limit ? parseInt(req.query.limit) : 1;
+    var limit = req.query.limit ? parseInt(req.query.limit) : 50;
     var query = req.query.name ? { name: String(req.query.name).toLowerCase() } : {};
     try {
         var names = await Person.paginate(query, { page: page, limit: limit });
