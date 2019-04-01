@@ -1,16 +1,16 @@
 var Person = require('../models/person')
 
 exports.addPerson = async function(req, res, next) {
-    if (!req.query.name || !req.query.age ) {
+    if (!req.body.name || !req.body.age ) {
         return res.status(400).json({ message: "Both name and age parameters are required." })
     }
     var person = {
-        name: String(req.query.name).toLowerCase(),
-        age: parseInt(req.query.age)
+        name: String(req.body.name).toLowerCase(),
+        age: parseInt(req.body.age)
     };
     var newPerson = new Person(person);
     try {
-        var persons = await Person.paginate({ name: req.query.name }, {})
+        var persons = await Person.paginate({ name: req.body.name }, {})
         if (persons.total > 0) {
             throw Error("Person with same name already exists.")
         }
@@ -53,9 +53,9 @@ exports.deletePerson = async function(req, res, next) {
 }
 
 exports.updatePerson = async function(req, res, next) {
-    var id = req.query.id ? req.query.id : false
-    var name = req.query.name ? req.query.name.toLowerCase() : null
-    var age = req.query.age ? req.query.age : null
+    var id = req.body.id ? req.body.id : false
+    var name = req.body.name ? req.body.name.toLowerCase() : null
+    var age = req.body.age ? req.body.age : null
     try {
         if (!id) {
             throw Error('ID is not present on the request.')
